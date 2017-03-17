@@ -46,24 +46,34 @@ public final class JavaKMeans {
   }
 
   public static void main(String[] args) {
-    if (args.length < 3) {
-      System.err.println(
-        "Usage: JavaKMeans <input_file> <k> <max_iterations> [<runs>]");
-      System.exit(1);
-    }
-    String inputFile = args[0];
-    int k = Integer.parseInt(args[1]);
-    int iterations = Integer.parseInt(args[2]);
+//    if (args.length < 3) {
+//      System.err.println(
+//        "Usage: JavaKMeans <input_file> <k> <max_iterations> [<runs>]");
+//      System.exit(1);
+//    }
+//    String inputFile = args[0];
+//    int k = Integer.parseInt(args[1]);
+//    int iterations = Integer.parseInt(args[2]);
+//    int runs = 1;
+//
+//    if (args.length >= 4) {
+//      runs = Integer.parseInt(args[3]);
+//    }
+
+    String inputFile = "./kmeans_data.txt";
+    int k = 2;
+    int iterations = 3;
     int runs = 1;
 
-    if (args.length >= 4) {
-      runs = Integer.parseInt(args[3]);
-    }
+    String testInputFile = "./kmeans_test.txt";
+
     SparkConf sparkConf = new SparkConf().setAppName("JavaKMeans");
     JavaSparkContext sc = new JavaSparkContext(sparkConf);
     JavaRDD<String> lines = sc.textFile(inputFile);
+    JavaRDD<String> linesTest = sc.textFile(testInputFile);
 
     JavaRDD<Vector> points = lines.map(new ParsePoint());
+    JavaRDD<Vector> pointsTest = linesTest.map(new ParsePoint());
 
     KMeansModel model = KMeans.train(points.rdd(), k, iterations, runs, KMeans.K_MEANS_PARALLEL());
 
@@ -73,6 +83,11 @@ public final class JavaKMeans {
     }
     double cost = model.computeCost(points.rdd());
     System.out.println("Cost: " + cost);
+
+
+    System.out.println("Predict: " + model.predict(Vectors.dense(98, 345, 90)));
+
+    System.out.println("Predict: " + model.predict(Vectors.dense(0.1, 0, 0.1)));
 
     sc.stop();
   }
