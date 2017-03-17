@@ -65,15 +65,12 @@ public final class JavaKMeans {
     int iterations = 3;
     int runs = 1;
 
-    String testInputFile = "./kmeans_test.txt";
-
     SparkConf sparkConf = new SparkConf().setAppName("JavaKMeans");
     JavaSparkContext sc = new JavaSparkContext(sparkConf);
     JavaRDD<String> lines = sc.textFile(inputFile);
-    JavaRDD<String> linesTest = sc.textFile(testInputFile);
 
     JavaRDD<Vector> points = lines.map(new ParsePoint());
-    JavaRDD<Vector> pointsTest = linesTest.map(new ParsePoint());
+
 
     KMeansModel model = KMeans.train(points.rdd(), k, iterations, runs, KMeans.K_MEANS_PARALLEL());
 
